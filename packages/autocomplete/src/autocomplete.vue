@@ -3,6 +3,7 @@
     <el-input
       ref="input"
       v-bind="$props"
+      :type="type"
       @compositionstart.native="handleComposition"
       @compositionupdate.native="handleComposition"
       @compositionend.native="handleComposition"
@@ -62,6 +63,10 @@
       popperClass: String,
       placeholder: String,
       disabled: Boolean,
+      type: {
+          type: String,
+          default: 'text'
+      },
       name: String,
       size: String,
       value: String,
@@ -70,6 +75,10 @@
       triggerOnFocus: {
         type: Boolean,
         default: true
+      },
+      inputOnSelect: {
+        type: Boolean,
+        default: false
       },
       customItem: String,
       icon: String,
@@ -97,7 +106,8 @@
     },
     watch: {
       suggestionVisible(val) {
-        this.broadcast('ElAutocompleteSuggestions', 'visible', [val, this.$refs.input.$refs.input.offsetWidth]);
+        let ele = this.$refs.input.$refs[this.type === 'textarea' ? 'textarea' : 'input'];
+        this.broadcast('ElAutocompleteSuggestions', 'visible', [val, ele.offsetWidth]);
       }
     },
     methods: {
@@ -150,7 +160,7 @@
         }
       },
       select(item) {
-        this.$emit('input', item[this.props.value]);
+        this.inputOnSelect && this.$emit('input', item[this.props.value]);
         this.$emit('select', item);
         this.$nextTick(_ => {
           this.suggestions = [];
